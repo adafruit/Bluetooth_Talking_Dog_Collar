@@ -16,9 +16,9 @@
 #include <Adafruit_BluefruitLE_SPI.h>
 #include <Adafruit_Soundboard.h>
 
-#define LED        13 // Bluefruit LE Micro onboard LED
-#define AUDIO_ACT   5 // "Act" on Audio FX
-#define AUDIO_RESET 6 // "Rst" on Audio FX
+#define LED         A0 // LED on while "talking"
+#define AUDIO_ACT   5  // "Act" on Audio FX
+#define AUDIO_RESET 6  // "Rst" on Audio FX
 
 Adafruit_Soundboard      sfx(&Serial1, NULL, AUDIO_RESET);
 Adafruit_BluefruitLE_SPI ble(8, 7, 4); // CS, IRQ, RST pins
@@ -74,8 +74,10 @@ boolean checkCRC(uint8_t sum, uint8_t CRCindex) {
 }
 
 void play(uint16_t i) {
+  digitalWrite(LED, HIGH);
   memcpy_P(filename, &bigStringTable[i * 8], 8); // PROGMEM -> RAM
   sfx.playTrack(filename);
   delay(250); // Need this -- some delay before ACT LED is valid
   while(digitalRead(AUDIO_ACT) == LOW); // Wait for sound to finish
+  digitalWrite(LED, LOW);
 }
